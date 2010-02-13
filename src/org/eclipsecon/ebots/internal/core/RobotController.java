@@ -2,9 +2,6 @@ package org.eclipsecon.ebots.internal.core;
 
 import java.io.IOException;
 
-import org.eclipsecon.ebots.core.ContestPlatform;
-import org.eclipsecon.ebots.internal.core.Robot;
-
 import lejos.nxt.remote.NXTCommand;
 import lejos.nxt.remote.OutputState;
 import lejos.pc.comm.NXTComm;
@@ -13,10 +10,20 @@ import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTInfo;
 
 public class RobotController extends Thread {
-
+	private static RobotController singleton;
+	static {
+		singleton = new RobotController();
+		singleton.start();
+	}
+	
+	public static RobotController getDefault() {
+		return singleton;
+	}
+	
 	private static final int RIGHT_WHEEL_PORT = 2;
 	private static final int LEFT_WHEEL_PORT = 1;
-	private static NXTCommand nxtCommand;
+	private NXTCommand nxtCommand;
+	private Robot robot = new Robot();
 
 	public RobotController() {
 		super("Robot Controller Thread");
@@ -44,7 +51,6 @@ public class RobotController extends Thread {
 			try {
 				while (true) {
 					Thread.sleep(500);
-					Robot robot = (Robot) ContestPlatform.getRobot();
 					robot.batteryLevel = nxtCommand.getBatteryLevel();
 					robot.leftOdom = nxtCommand.getTachoCount(LEFT_WHEEL_PORT);
 					robot.rightOdom = nxtCommand.getTachoCount(RIGHT_WHEEL_PORT);
@@ -68,14 +74,14 @@ public class RobotController extends Thread {
 		}
 	}
 
-	private static void connect() throws NXTCommException {
+	private void connect() throws NXTCommException {
 		NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
 		NXTInfo nxtInfo = new NXTInfo(NXTCommFactory.BLUETOOTH, "NXT", "00:16:53:03:A6:D3");
 		nxtComm.open(nxtInfo);
 		nxtCommand.setNXTComm(nxtComm);
 	}
 
-	public static void setWheelVelocity(int left, int right) {
+	public void setWheelVelocity(int left, int right) {
 
 		// If we've lost connection, just wait until connection is re-established
 		while (!connected()) {
@@ -92,7 +98,7 @@ public class RobotController extends Thread {
 		}
 	}
 
-	public static boolean connected() {
+	public boolean connected() {
 		return ((nxtCommand != null) && nxtCommand.isOpen());
 	}
 

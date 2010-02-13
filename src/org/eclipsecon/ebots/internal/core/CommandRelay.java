@@ -9,6 +9,7 @@ public class CommandRelay {
 	public final String bucket;
 	public static final String BUCKET_NAME = "khawaja";
 	private String lastCommandVersion = "";
+	private RobotController rc = RobotController.getDefault();
 
 	private Boolean active = false;
 
@@ -59,7 +60,7 @@ public class CommandRelay {
 										continue;
 									
 									//send the command to the robot controller here
-									RobotController.setWheelVelocity(wheel1, wheel2);
+									rc.setWheelVelocity(wheel1, wheel2);
 								}
 								else 
 									return;

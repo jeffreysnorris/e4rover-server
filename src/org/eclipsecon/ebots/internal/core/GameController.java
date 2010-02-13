@@ -3,6 +3,7 @@ package org.eclipsecon.ebots.internal.core;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipsecon.ebots.core.ContestPlatform;
+import org.eclipsecon.ebots.core.IPlayers;
 import org.eclipsecon.ebots.core.IShot;
 
 public class GameController extends Thread {
@@ -12,6 +13,8 @@ public class GameController extends Thread {
 		Thread.sleep(Long.MAX_VALUE);
 	}
 
+	protected IPlayers players = new Players();
+	
 	public GameController() {
 		super("Game Controller Thread");
 	}
@@ -80,7 +83,7 @@ public class GameController extends Thread {
 				game.nextShot = null;
 				game.nextReward = 0;
 				
-				Player player = ContestPlatform.getPlayers().getPlayerMap().get(game.playerName);
+				Player player = (Player)players.getPlayerMap().get(game.playerName);
 				// TODO: Null check OR make the get blocking 
 				player.incrementPlayCount();
 				// Update player best score if warranted
@@ -89,8 +92,7 @@ public class GameController extends Thread {
 				}
 				
 				Persister.updateToServer(game);
-				Persister.updateToServer(ContestPlatform.getPlayers());
-				
+				Persister.updateToServer(players);
 			}
 
 
