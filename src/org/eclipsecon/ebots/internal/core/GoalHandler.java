@@ -23,37 +23,37 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 
 	ArrayBlockingQueue<IGoal> goalQueue = new ArrayBlockingQueue<IGoal>(1);
 	
-	private static final Map<Integer, IGoal.TARGET> PHIDGET_ID_TO_GOAL_MAP = new HashMap<Integer, IGoal.TARGET>();
+	private static final Map<Integer, IGoal.TARGET> PHIDGET_ID_TO_TARGET_MAP = new HashMap<Integer, IGoal.TARGET>();
 	private static final Set<RFIDPhidget> phidgets = new HashSet<RFIDPhidget>();
 
 	private static final Map<String, IGoal.INSTRUMENT> SPIRIT_ID_TO_INSTRUMENT_MAP = new HashMap<String, IGoal.INSTRUMENT>();
-	private static final Map<String, IGoal.INSTRUMENT> OPPY_ID_TO_PUCK_MAP = new HashMap<String, IGoal.INSTRUMENT>();
-	private static final Map<String, IGoal.INSTRUMENT> idToPuckMap;
+	private static final Map<String, IGoal.INSTRUMENT> OPPY_ID_TO_INSTRUMENT_MAP = new HashMap<String, IGoal.INSTRUMENT>();
+	private static final Map<String, IGoal.INSTRUMENT> idToInstrumentMap;
 
 	static {
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005150ef", IGoal.INSTRUMENT.A);
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("17004aabcd", IGoal.INSTRUMENT.B);
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005163fd", IGoal.INSTRUMENT.C);
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("1600518eab", IGoal.INSTRUMENT.D);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005150ef", IGoal.INSTRUMENT.MICROSCOPE);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("17004aabcd", IGoal.INSTRUMENT.SPECTROMETER);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005163fd", IGoal.INSTRUMENT.DRILL); 
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("1600518eab", IGoal.INSTRUMENT.BRUSH);
 
 		// TODO: Populate these with the real RFIDs
-		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.A);
-		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.B);
-		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.C);
-		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.D);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.MICROSCOPE);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.SPECTROMETER);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.DRILL);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.BRUSH); 
 
 		// TODO: Add the rest of the phidget IDs
-		PHIDGET_ID_TO_GOAL_MAP.put(90673, TARGET.G1);
+		PHIDGET_ID_TO_TARGET_MAP.put(90673, TARGET.G1);
 
 		if (ArenaServerApplication.getRobotName().equals(ROBOT.SPIRIT))
-			idToPuckMap = SPIRIT_ID_TO_INSTRUMENT_MAP;
+			idToInstrumentMap = SPIRIT_ID_TO_INSTRUMENT_MAP;
 		else
-			idToPuckMap = OPPY_ID_TO_PUCK_MAP;
+			idToInstrumentMap = OPPY_ID_TO_INSTRUMENT_MAP;
 	}
 
 	public GoalHandler()  {
 		try {
-			for (Integer serial: PHIDGET_ID_TO_GOAL_MAP.keySet()) {
+			for (Integer serial: PHIDGET_ID_TO_TARGET_MAP.keySet()) {
 				RFIDPhidget phidget = new RFIDPhidget();
 				phidget.addAttachListener(this);
 				phidget.addTagGainListener(this);
@@ -73,8 +73,8 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 	public void tagGained(TagGainEvent e) {
 		//		System.err.println(e);
 		try {
-			IGoal.TARGET target = PHIDGET_ID_TO_GOAL_MAP.get(e.getSource().getSerialNumber());
-			IGoal.INSTRUMENT instrument = idToPuckMap.get(e.getValue());
+			IGoal.TARGET target = PHIDGET_ID_TO_TARGET_MAP.get(e.getSource().getSerialNumber());
+			IGoal.INSTRUMENT instrument = idToInstrumentMap.get(e.getValue());
 			Goal goal = new Goal(target, instrument);
 			goalQueue.put(goal);
 
