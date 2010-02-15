@@ -3,11 +3,11 @@ package org.eclipsecon.ebots.internal.core;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipsecon.ebots.core.ContestPlatform;
-import org.eclipsecon.ebots.core.IShot;
+import org.eclipsecon.ebots.core.IGoal;
 
 public class GameController extends Thread {
 
-	private ShotHandler shotHandler = new ShotHandler();
+	private GoalHandler goalHandler = new GoalHandler();
 	private boolean shutdown;
 	
 	public GameController() {
@@ -34,34 +34,37 @@ public class GameController extends Thread {
 			//TODO Get the real bucket for this player
 			String bucketName = "";
 			CommandRelay commandRelay = new CommandRelay(bucketName);
+			// TODO: command relay was malfunctioning (the file wasn't present on the server).  Needs to be more forgiving of this.  Disabling for now.
 			//commandRelay.start();
 			game.enterPlayingState();
 
 			// PLAY GAME
 			while (game.tickPlayClock()) {
-				// Check for shots
-				IShot shot = null;
+				// Check for goals
+				IGoal goal = null;
 				try {
-					shot = shotHandler.getShotQueue().poll(1, TimeUnit.SECONDS);
+					goal = goalHandler.getGoalQueue().poll(1, TimeUnit.SECONDS);
 				} catch (InterruptedException e) {/*ignore*/}
-				if (shot != null) {
-					game.handleShot(shot);
+				if (goal != null) {
+					game.handleGoal(goal);
 				}
 				Persister.updateToServer(game);
 			}
 
 			// GAME OVER
 			//commandRelay.stop();
+			String lastPlayerName = game.getPlayerName();
+			int lastScore = game.getScore();
 			game.enterGameOverState();
 			Persister.updateToServer(game);
 
 			// UPDATE SCORES
-			Player player = ContestPlatform.getPlayers().getPlayerMap().get(game.playerName);
+			Player player = ContestPlatform.getPlayers().getPlayerMap().get(lastPlayerName);
 			// TODO: Null check OR make the get blocking 
 			player.incrementPlayCount();
 			// Update player best score if warranted
-			if (player.getHighScore() < game.getScore()) {
-				player.setHighScore(game.getScore());
+			if (player.getHighScore() < lastScore) {
+				player.setHighScore(lastScore);
 			}
 
 			Persister.updateToServer(ContestPlatform.getPlayers());
@@ -73,6 +76,6 @@ public class GameController extends Thread {
 
 	public void shutdown() {
 		shutdown = true;
-		shotHandler.shutdown();
+		goalHandler.shutdown();
 	}
 }

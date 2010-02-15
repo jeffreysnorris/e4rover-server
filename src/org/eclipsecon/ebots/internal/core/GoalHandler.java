@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.eclipsecon.ebots.core.IShot;
-import org.eclipsecon.ebots.core.IShot.GOAL;
+import org.eclipsecon.ebots.core.IGoal;
+import org.eclipsecon.ebots.core.IGoal.TARGET;
 import org.eclipsecon.ebots.internal.core.ArenaServerApplication.ROBOT;
 
 import com.phidgets.PhidgetException;
@@ -19,39 +19,39 @@ import com.phidgets.event.ErrorListener;
 import com.phidgets.event.TagGainEvent;
 import com.phidgets.event.TagGainListener;
 
-public class ShotHandler implements TagGainListener, AttachListener, ErrorListener {
+public class GoalHandler implements TagGainListener, AttachListener, ErrorListener {
 
-	ArrayBlockingQueue<IShot> shotQueue = new ArrayBlockingQueue<IShot>(1);
+	ArrayBlockingQueue<IGoal> goalQueue = new ArrayBlockingQueue<IGoal>(1);
 	
-	private static final Map<Integer, Shot.GOAL> PHIDGET_ID_TO_GOAL_MAP = new HashMap<Integer, Shot.GOAL>();
+	private static final Map<Integer, IGoal.TARGET> PHIDGET_ID_TO_GOAL_MAP = new HashMap<Integer, IGoal.TARGET>();
 	private static final Set<RFIDPhidget> phidgets = new HashSet<RFIDPhidget>();
 
-	private static final Map<String, Shot.PUCK> SPIRIT_ID_TO_PUCK_MAP = new HashMap<String, Shot.PUCK>();
-	private static final Map<String, Shot.PUCK> OPPY_ID_TO_PUCK_MAP = new HashMap<String, Shot.PUCK>();
-	private static final Map<String, Shot.PUCK> idToPuckMap;
+	private static final Map<String, IGoal.INSTRUMENT> SPIRIT_ID_TO_INSTRUMENT_MAP = new HashMap<String, IGoal.INSTRUMENT>();
+	private static final Map<String, IGoal.INSTRUMENT> OPPY_ID_TO_PUCK_MAP = new HashMap<String, IGoal.INSTRUMENT>();
+	private static final Map<String, IGoal.INSTRUMENT> idToPuckMap;
 
 	static {
-		SPIRIT_ID_TO_PUCK_MAP.put("16005150ef", Shot.PUCK.A);
-		SPIRIT_ID_TO_PUCK_MAP.put("17004aabcd", Shot.PUCK.B);
-		SPIRIT_ID_TO_PUCK_MAP.put("16005163fd", Shot.PUCK.C);
-		SPIRIT_ID_TO_PUCK_MAP.put("1600518eab", Shot.PUCK.D);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005150ef", IGoal.INSTRUMENT.A);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("17004aabcd", IGoal.INSTRUMENT.B);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005163fd", IGoal.INSTRUMENT.C);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("1600518eab", IGoal.INSTRUMENT.D);
 
 		// TODO: Populate these with the real RFIDs
-		OPPY_ID_TO_PUCK_MAP.put("FOO", Shot.PUCK.A);
-		OPPY_ID_TO_PUCK_MAP.put("FOO", Shot.PUCK.B);
-		OPPY_ID_TO_PUCK_MAP.put("FOO", Shot.PUCK.C);
-		OPPY_ID_TO_PUCK_MAP.put("FOO", Shot.PUCK.D);
+		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.A);
+		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.B);
+		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.C);
+		OPPY_ID_TO_PUCK_MAP.put("FOO", IGoal.INSTRUMENT.D);
 
 		// TODO: Add the rest of the phidget IDs
-		PHIDGET_ID_TO_GOAL_MAP.put(90673, GOAL.G1);
+		PHIDGET_ID_TO_GOAL_MAP.put(90673, TARGET.G1);
 
 		if (ArenaServerApplication.getRobotName().equals(ROBOT.SPIRIT))
-			idToPuckMap = SPIRIT_ID_TO_PUCK_MAP;
+			idToPuckMap = SPIRIT_ID_TO_INSTRUMENT_MAP;
 		else
 			idToPuckMap = OPPY_ID_TO_PUCK_MAP;
 	}
 
-	public ShotHandler()  {
+	public GoalHandler()  {
 		try {
 			for (Integer serial: PHIDGET_ID_TO_GOAL_MAP.keySet()) {
 				RFIDPhidget phidget = new RFIDPhidget();
@@ -66,17 +66,17 @@ public class ShotHandler implements TagGainListener, AttachListener, ErrorListen
 		}
 	}
 
-	public ArrayBlockingQueue<IShot> getShotQueue() {
-		return shotQueue;
+	public ArrayBlockingQueue<IGoal> getGoalQueue() {
+		return goalQueue;
 	}
 
 	public void tagGained(TagGainEvent e) {
 		//		System.err.println(e);
 		try {
-			Shot.GOAL goal = PHIDGET_ID_TO_GOAL_MAP.get(e.getSource().getSerialNumber());
-			Shot.PUCK puck = idToPuckMap.get(e.getValue());
-			Shot shot = new Shot(goal, puck);
-			shotQueue.put(shot);
+			IGoal.TARGET target = PHIDGET_ID_TO_GOAL_MAP.get(e.getSource().getSerialNumber());
+			IGoal.INSTRUMENT instrument = idToPuckMap.get(e.getValue());
+			Goal goal = new Goal(target, instrument);
+			goalQueue.put(goal);
 
 		} catch (PhidgetException pe) {
 			pe.printStackTrace();
