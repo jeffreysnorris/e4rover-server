@@ -10,7 +10,7 @@ import org.eclipsecon.ebots.core.IRobot;
 import org.eclipsecon.ebots.core.IS3Constants;
 
 public class Persister {
-
+	
 	private static final String EBOTS_BUCKET_NAME = "ebots";
 	public static void updateToServer(IGame game) {
 		try {

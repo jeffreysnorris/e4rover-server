@@ -2,99 +2,81 @@ package org.eclipsecon.ebots.internal.core;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipsecon.ebots.core.ContestPlatform;
+import org.eclipsecon.ebots.core.IGoal;
 import org.eclipsecon.ebots.core.IPlayers;
-import org.eclipsecon.ebots.core.IShot;
 
 public class GameController extends Thread {
 
-	public static void main(String[] args) throws InterruptedException {
-		(new GameController()).start();
-		Thread.sleep(Long.MAX_VALUE);
-	}
-
 	protected IPlayers players = new Players();
+	private GoalHandler goalHandler = new GoalHandler();
+	private boolean shutdown;
 	
 	public GameController() {
 		super("Game Controller Thread");
 	}
-	
+
+	@Override
 	public void run() {
 
-			Game game = new Game();
-			while (true) {
+		GameStatus game = new GameStatus();
+		
+		while (!shutdown) {
 
-				// TODO Check queue for next player
-				game.playerName = "Jeff";
+			// TODO Check queue for next player
 
-				// COUNTDOWN PHASE
-				game.countdownSeconds = Game.COUNTDOWN_SECONDS;
-				long startTime = System.currentTimeMillis() + (game.countdownSeconds * 1000);
-				while (System.currentTimeMillis()< startTime) {
-					try { sleep(1000); } catch (InterruptedException e) {/*ignore*/}
-					game.countdownSeconds = (int) ((startTime - System.currentTimeMillis())/1000);
-					Persister.updateToServer(game);
-				}
-
-				// START GAME
-				game.countdownSeconds = 0;
-				game.remainingSeconds = Game.GAME_LENGTH_SECONDS;
-				game.lastShot = null;
-				game.nextShot = new Shot();
-				game.nextReward = Game.FIRST_REWARD;
-				game.score = 0;
-				long endTime = System.currentTimeMillis() + (game.remainingSeconds * 1000);
-				
-				//TODO Get the real bucket for this player
-				String bucketName = "";
-				CommandRelay commandRelay = new CommandRelay(bucketName);
-				commandRelay.start();
-				while (System.currentTimeMillis() < endTime) {
-					// Check for shots
-					IShot shot = null;
-					try {
-						//TODO there isn't yet anything that put a shot into this Queue.  Need to remember to hook that up.
-						shot = ShotHandler.instance.getShotQueue().poll(1, TimeUnit.SECONDS);
-					} catch (InterruptedException e) {/*ignore*/}
-					if (shot != null) {
-						// A shot has been made
-						if (shot.equals(game.nextShot)) {
-							// It's good!  Dispense rewards.
-							game.score += game.nextReward;
-							game.nextReward++;
-						} else {
-							// They get nothing.  They lose.  Good day sir.
-							game.nextReward = Game.FIRST_REWARD;
-						}
-						// time for next shot
-						game.lastShot = game.nextShot;
-						game.nextShot = new Shot();
-					}										
-
-					// count down time
-					game.remainingSeconds = (int) ((endTime - System.currentTimeMillis())/1000);
-					Persister.updateToServer(game);
-				}
-				commandRelay.stop();
-				
-				// GAME OVER
-				game.remainingSeconds = 0;
-				game.lastShot = null;
-				game.nextShot = null;
-				game.nextReward = 0;
-				
-				Player player = (Player)players.getPlayerMap().get(game.playerName);
-				// TODO: Null check OR make the get blocking 
-				player.incrementPlayCount();
-				// Update player best score if warranted
-				if (player.getHighScore() < game.score) {
-					player.setHighScore(game.score);
-				}
-				
+			// COUNTDOWN TO GAME START
+			game.enterCountdownState("Bob");
+			while (game.tickCountdownClock()) {
+				try { sleep(1000); } catch (InterruptedException e) {/*ignore*/}
 				Persister.updateToServer(game);
-				Persister.updateToServer(players);
 			}
 
+			// START GAME
+			//TODO Get the real bucket for this player
+			String bucketName = "";
+			CommandRelay commandRelay = new CommandRelay(bucketName);
+			// TODO: command relay was malfunctioning (the file wasn't present on the server).  Needs to be more forgiving of this.  Disabling for now.
+			//commandRelay.start();
+			game.enterPlayingState();
+
+			// PLAY GAME
+			while (game.tickPlayClock()) {
+				// Check for goals
+				IGoal goal = null;
+				try {
+					goal = goalHandler.getGoalQueue().poll(1, TimeUnit.SECONDS);
+				} catch (InterruptedException e) {/*ignore*/}
+				if (goal != null) {
+					game.handleGoal(goal);
+				}
+				Persister.updateToServer(game);
+			}
+
+			// GAME OVER
+			//commandRelay.stop();
+			String lastPlayerName = game.getPlayerName();
+			int lastScore = game.getScore();
+			game.enterGameOverState();
+			Persister.updateToServer(game);
+
+			// UPDATE SCORES
+			Player player = (Player)players.getPlayerMap().get(lastPlayerName);
+			// TODO: Null check OR make the get blocking 
+			player.incrementPlayCount();
+			// Update player best score if warranted
+			if (player.getHighScore() < lastScore) {
+				player.setHighScore(lastScore);
+			}
+
+			Persister.updateToServer(players);
 
 		}
+
+
+	}
+
+	public void shutdown() {
+		shutdown = true;
+		goalHandler.shutdown();
+	}
 }

@@ -67,8 +67,11 @@ public class CommandRelay {
 							}
 						}
 					} catch (Exception e1) {
-						e1.printStackTrace();
+//						e1.printStackTrace();
 					}
+					try {
+						sleep(100);
+					} catch (InterruptedException e) {/*empty*/}
 				}
 			}
 

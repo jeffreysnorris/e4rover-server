@@ -23,17 +23,18 @@ public class RobotController extends Thread {
 	private static final int RIGHT_WHEEL_PORT = 2;
 	private static final int LEFT_WHEEL_PORT = 1;
 	private NXTCommand nxtCommand;
-	private Robot robot = new Robot();
-
+	private boolean shutdown = false;
+	
 	public RobotController() {
 		super("Robot Controller Thread");
 	}
 	
+	@Override
 	public void run() {
 		while(true) {
 
 			nxtCommand = new NXTCommand();
-
+			System.out.println("Attempting to connect to robot...");
 			// Stubbornly attempt to establish connection
 			while (!connected()) {
 				try {				
@@ -46,19 +47,31 @@ public class RobotController extends Thread {
 					System.err.println("Failed to connect to robot, retrying...");
 				}
 			}
-
+			
+			System.out.println("Connected to robot successfully.  Commencing montoring of telemetry...");
+			try {
+				nxtCommand.playTone(1700, 400);
+				Thread.sleep(400);
+				nxtCommand.playTone(2000, 400);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			// Fetch telemetry periodically
 			try {
-				while (true) {
+				while (!shutdown) {
 					Thread.sleep(500);
-					robot.batteryLevel = nxtCommand.getBatteryLevel();
-					robot.leftOdom = nxtCommand.getTachoCount(LEFT_WHEEL_PORT);
-					robot.rightOdom = nxtCommand.getTachoCount(RIGHT_WHEEL_PORT);
+
+					int batteryLevel = nxtCommand.getBatteryLevel();
+					int leftOdom = nxtCommand.getTachoCount(LEFT_WHEEL_PORT);
+					int rightOdom = nxtCommand.getTachoCount(RIGHT_WHEEL_PORT);
+
 					OutputState outputState = nxtCommand.getOutputState(LEFT_WHEEL_PORT);
-					robot.leftPower = outputState.powerSetpoint;
+					int leftPower = outputState.powerSetpoint;
 					outputState = nxtCommand.getOutputState(RIGHT_WHEEL_PORT);
-					robot.rightPower = outputState.powerSetpoint;
-					Persister.updateToServer(robot);
+					int rightPower = outputState.powerSetpoint;
+					
+					Persister.updateToServer(new Robot(batteryLevel, leftPower, rightPower, leftOdom, rightOdom));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -69,9 +82,14 @@ public class RobotController extends Thread {
 				} catch (IOException e) {/*empty*/}
 			}
 
-			// If we get here, we lost connection with the robot and it is
-			// time to reconnect
+			// If we get here without shutdown, we lost connection with the
+			// robot and it is time to reconnect
+			
+			if (shutdown)
+				break;  // kill the monitoring thread
 		}
+		System.out.println("Monitoring thread exited normally.");
+
 	}
 
 	private void connect() throws NXTCommException {
@@ -102,13 +120,19 @@ public class RobotController extends Thread {
 		return ((nxtCommand != null) && nxtCommand.isOpen());
 	}
 
-	public static void main(String[] args) throws InterruptedException {
-		while (true) {
-			//			setWheelVelocity(30, -30);
-			Thread.sleep(2000);
-			//			setWheelVelocity(0, 0);
-			Thread.sleep(2000);
+	public void shutdown() {
+		try {
+			shutdown = true;
+			System.out.println("Shutting down robot controller...");
+			Thread.sleep(1500);  // let monitoring thread die
+			nxtCommand.close();
+			nxtCommand = null;
+			System.out.println("   ...Robot controller shudown complete.");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
 	}
 
 }

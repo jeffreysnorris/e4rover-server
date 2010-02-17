@@ -13,9 +13,6 @@ public class Commander {
 		this.bucket = bucket;
 	}
 	
-	
-	
-
 	public void sendCommand(String command) throws IOException {
 		S3Utils.uploadFile(bucket, "command.xml", command);
 	}
