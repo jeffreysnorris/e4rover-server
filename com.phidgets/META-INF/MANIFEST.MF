@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Phidgets
+Bundle-SymbolicName: com.phidgets
+Bundle-Version: 1.0.0
+Bundle-ClassPath: phidget21.jar
+Export-Package: com.phidgets,
+ com.phidgets.event
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
