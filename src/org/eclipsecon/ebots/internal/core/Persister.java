@@ -1,13 +1,12 @@
 package org.eclipsecon.ebots.internal.core;
 
-import gov.nasa.jpl.maestro.cloud.s3.S3Utils;
-
 import java.io.IOException;
 
 import org.eclipsecon.ebots.core.IGame;
 import org.eclipsecon.ebots.core.IPlayers;
 import org.eclipsecon.ebots.core.IRobot;
 import org.eclipsecon.ebots.core.IS3Constants;
+import org.eclipsecon.ebots.s3.S3Utils;
 
 public class Persister {
 	

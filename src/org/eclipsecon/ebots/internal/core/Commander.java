@@ -2,7 +2,7 @@ package org.eclipsecon.ebots.internal.core;
 
 import java.io.IOException;
 
-import gov.nasa.jpl.maestro.cloud.s3.S3Utils;
+import org.eclipsecon.ebots.s3.S3Utils;
 
 
 public class Commander {
