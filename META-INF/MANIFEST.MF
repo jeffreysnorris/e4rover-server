@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Xmlbuilder
+Bundle-SymbolicName: com.jamesmurty.xmlbuilder
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: JAMESMURTY
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: com.jamesmurty.utils,
+ net.iharder.base64
+Bundle-ClassPath: java-xmlbuilder-0.3.jar,
+ .
