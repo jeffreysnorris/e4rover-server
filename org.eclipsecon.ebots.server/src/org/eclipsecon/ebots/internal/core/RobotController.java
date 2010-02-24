@@ -94,7 +94,7 @@ public class RobotController extends Thread {
 
 	private void connect() throws NXTCommException {
 		NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
-		NXTInfo nxtInfo = new NXTInfo(NXTCommFactory.BLUETOOTH, "NXT", "00:16:53:03:A6:D3");
+		NXTInfo nxtInfo = new NXTInfo(NXTCommFactory.BLUETOOTH, "NXT", "00:16:53:0B:48:08");
 		nxtComm.open(nxtInfo);
 		nxtCommand.setNXTComm(nxtComm);
 	}

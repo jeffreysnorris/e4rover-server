@@ -6,7 +6,6 @@ import org.eclipse.equinox.app.IApplicationContext;
 public class ArenaServerApplication implements IApplication {
 
 	private GameController gameController;
-	private RobotController robotController;
 
 	enum ROBOT {SPIRIT, OPPY}
 	private static ROBOT robotName = ROBOT.SPIRIT;
@@ -21,8 +20,7 @@ public class ArenaServerApplication implements IApplication {
 			else
 				throw new IllegalArgumentException("Unrecognized rover name " + args[0]);
 		}
-		robotController = new RobotController();
-		robotController.start();
+		RobotController.getDefault();
 
 		gameController = new GameController();
 		gameController.start();
@@ -30,7 +28,7 @@ public class ArenaServerApplication implements IApplication {
 		
 		// SHUTDOWN
 		gameController.shutdown();
-		robotController.shutdown();
+		RobotController.getDefault().shutdown();
 		
 		return null;
 	}

@@ -33,10 +33,8 @@ public class GameController extends Thread {
 
 			// START GAME
 			//TODO Get the real bucket for this player
-			String bucketName = "";
-			CommandRelay commandRelay = new CommandRelay(bucketName);
-			// TODO: command relay was malfunctioning (the file wasn't present on the server).  Needs to be more forgiving of this.  Disabling for now.
-			//commandRelay.start();
+			CommandRelay commandRelay = new CommandRelay(game.getPlayerName());
+			commandRelay.start();
 			game.enterPlayingState();
 
 			// PLAY GAME

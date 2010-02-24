@@ -64,7 +64,8 @@ public class GameStatus extends Game {
 		}
 		return true;
 	}
-
+	
+	
 	/**
 	 * Called when a goal attempt has been detected by the server. It is compared
 	 * against the expected goal and if it matches, the player's score is

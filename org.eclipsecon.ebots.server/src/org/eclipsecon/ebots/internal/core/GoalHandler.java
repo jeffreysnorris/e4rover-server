@@ -31,20 +31,22 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 	private static final Map<String, IGoal.INSTRUMENT> idToInstrumentMap;
 
 	static {
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005150ef", IGoal.INSTRUMENT.MICROSCOPE);
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("17004aabcd", IGoal.INSTRUMENT.SPECTROMETER);
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005163fd", IGoal.INSTRUMENT.DRILL); 
-		SPIRIT_ID_TO_INSTRUMENT_MAP.put("1600518eab", IGoal.INSTRUMENT.BRUSH);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("160051499a", IGoal.INSTRUMENT.MICROSCOPE);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("1600517268", IGoal.INSTRUMENT.SPECTROMETER);
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("16005179ae", IGoal.INSTRUMENT.DRILL); 
+		SPIRIT_ID_TO_INSTRUMENT_MAP.put("1600515479", IGoal.INSTRUMENT.BRUSH);
 
-		// TODO: Populate these with the real RFIDs
-		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.MICROSCOPE);
-		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.SPECTROMETER);
-		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.DRILL);
-		OPPY_ID_TO_INSTRUMENT_MAP.put("FOO", IGoal.INSTRUMENT.BRUSH); 
+		OPPY_ID_TO_INSTRUMENT_MAP.put("16005150ef", IGoal.INSTRUMENT.MICROSCOPE);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("17004aabcd", IGoal.INSTRUMENT.SPECTROMETER);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("16005163fd", IGoal.INSTRUMENT.DRILL);
+		OPPY_ID_TO_INSTRUMENT_MAP.put("1600518eab", IGoal.INSTRUMENT.BRUSH); 
 
-		// TODO: Add the rest of the phidget IDs
-		PHIDGET_ID_TO_TARGET_MAP.put(90673, TARGET.G1);
-
+		PHIDGET_ID_TO_TARGET_MAP.put(90673, TARGET.ADIRONDACK);
+		PHIDGET_ID_TO_TARGET_MAP.put(90891, TARGET.MIMI);
+		PHIDGET_ID_TO_TARGET_MAP.put(89236, TARGET.HUMPHREY);
+		PHIDGET_ID_TO_TARGET_MAP.put(90948, TARGET.MAZATZAL);
+//		PHIDGET_ID_TO_TARGET_MAP.put(89239, SPARE);
+		
 		if (ArenaServerApplication.getRobotName().equals(ROBOT.SPIRIT))
 			idToInstrumentMap = SPIRIT_ID_TO_INSTRUMENT_MAP;
 		else
@@ -59,6 +61,8 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 				phidget.addTagGainListener(this);
 				phidget.addErrorListener(this);
 				phidget.open(serial);
+				phidget.waitForAttachment();
+				System.out.println("Phidget " + serial + " opened for target " + PHIDGET_ID_TO_TARGET_MAP.get(serial) + ".");
 				phidgets.add(phidget);
 			}
 		} catch (PhidgetException e) {
@@ -71,7 +75,7 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 	}
 
 	public void tagGained(TagGainEvent e) {
-		//		System.err.println(e);
+		System.out.println(e);
 		try {
 			IGoal.TARGET target = PHIDGET_ID_TO_TARGET_MAP.get(e.getSource().getSerialNumber());
 			IGoal.INSTRUMENT instrument = idToInstrumentMap.get(e.getValue());
@@ -86,7 +90,7 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 	}
 
 	public void attached(AttachEvent ae) {
-		//		System.err.println(ae);
+		System.out.println(ae);
 		try {
 			((RFIDPhidget) ae.getSource()).setLEDOn(true);
 		} catch (PhidgetException e) {
@@ -102,7 +106,8 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 		System.out.println("Closing Phidgets...");
 		try {
 			for (RFIDPhidget phidget: phidgets) {
-				phidget.setLEDOn(false);
+				if (phidget.isAttached())
+					phidget.setLEDOn(false);
 				phidget.close();
 			}
 		} catch (PhidgetException e) {

@@ -2,19 +2,31 @@ package org.eclipsecon.ebots.internal.core;
 
 import java.io.IOException;
 
-import org.eclipsecon.ebots.s3.S3Utils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.eclipsecon.ebots.core.IS3Constants;
 
 
-public class Commander {
+public class Commander implements IS3Constants {
 	
-	private final String bucket;
+	private static final HttpClient client = new HttpClient();
+	private final String playerHash;
 	
-	public Commander(String bucket) {
-		this.bucket = bucket;
+	public Commander(String playerHash) {
+		this.playerHash = playerHash;
 	}
 	
-	public void sendCommand(String command) throws IOException {
-		S3Utils.uploadFile(bucket, "command.xml", command);
+	public void setWheelVelocity(int leftWheel, int rightWheel) throws IOException {
+		PostMethod post = new PostMethod(REST_BASE_URL + "cmd/" + playerHash );
+		try {
+			String command = leftWheel + "," + rightWheel;
+			post.setRequestEntity(new StringRequestEntity(command, "text/xml", "UTF-8"));
+			client.executeMethod(post);
+		} finally {
+			post.releaseConnection();
+		}
+		
 	}
 
 }
