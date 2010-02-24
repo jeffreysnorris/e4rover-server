@@ -28,7 +28,7 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 
 	private static final Map<String, IGoal.INSTRUMENT> SPIRIT_ID_TO_INSTRUMENT_MAP = new HashMap<String, IGoal.INSTRUMENT>();
 	private static final Map<String, IGoal.INSTRUMENT> OPPY_ID_TO_INSTRUMENT_MAP = new HashMap<String, IGoal.INSTRUMENT>();
-	private static final Map<String, IGoal.INSTRUMENT> idToInstrumentMap;
+	private static Map<String, IGoal.INSTRUMENT> idToInstrumentMap;
 
 	static {
 		SPIRIT_ID_TO_INSTRUMENT_MAP.put("160051499a", IGoal.INSTRUMENT.MICROSCOPE);
@@ -47,13 +47,14 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 		PHIDGET_ID_TO_TARGET_MAP.put(90948, TARGET.MAZATZAL);
 //		PHIDGET_ID_TO_TARGET_MAP.put(89239, SPARE);
 		
+	}
+
+	public GoalHandler()  {
 		if (ArenaServerApplication.getRobotName().equals(ROBOT.SPIRIT))
 			idToInstrumentMap = SPIRIT_ID_TO_INSTRUMENT_MAP;
 		else
 			idToInstrumentMap = OPPY_ID_TO_INSTRUMENT_MAP;
-	}
-
-	public GoalHandler()  {
+		
 		try {
 			for (Integer serial: PHIDGET_ID_TO_TARGET_MAP.keySet()) {
 				RFIDPhidget phidget = new RFIDPhidget();

@@ -10,6 +10,12 @@ import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTInfo;
 
 public class RobotController extends Thread {
+	
+	private static final String SPIRIT_BLUETOOTH_ADDRESS = "00:16:53:0B:48:08";
+	private static final String OPPY_BLUETOOTH_ADDRESS = "00:16:53:0C:CB:F0";
+	
+	private static String robotBluetoothAddress;
+	
 	private static RobotController singleton;
 	static {
 		singleton = new RobotController();
@@ -27,6 +33,11 @@ public class RobotController extends Thread {
 	
 	public RobotController() {
 		super("Robot Controller Thread");
+		
+		if (ArenaServerApplication.getRobotName().equals(ArenaServerApplication.ROBOT.OPPY))
+			robotBluetoothAddress = OPPY_BLUETOOTH_ADDRESS;
+		else
+			robotBluetoothAddress = SPIRIT_BLUETOOTH_ADDRESS;
 	}
 	
 	@Override
@@ -41,7 +52,7 @@ public class RobotController extends Thread {
 					connect();
 					if (nxtCommand.isOpen())
 						break;
-					Thread.sleep(1000);
+					Thread.sleep(200);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.err.println("Failed to connect to robot, retrying...");
@@ -94,7 +105,7 @@ public class RobotController extends Thread {
 
 	private void connect() throws NXTCommException {
 		NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
-		NXTInfo nxtInfo = new NXTInfo(NXTCommFactory.BLUETOOTH, "NXT", "00:16:53:0B:48:08");
+		NXTInfo nxtInfo = new NXTInfo(NXTCommFactory.BLUETOOTH, ArenaServerApplication.getRobotName().toString(), robotBluetoothAddress);
 		nxtComm.open(nxtInfo);
 		nxtCommand.setNXTComm(nxtComm);
 	}
