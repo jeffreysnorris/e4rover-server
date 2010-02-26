@@ -5,10 +5,10 @@ import java.io.IOException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.eclipsecon.ebots.core.IS3Constants;
+import org.eclipsecon.ebots.core.IServerConstants;
 
 
-public class Commander implements IS3Constants {
+public class Commander implements IServerConstants {
 	
 	private static final HttpClient client = new HttpClient();
 	private final String playerHash;
@@ -18,7 +18,7 @@ public class Commander implements IS3Constants {
 	}
 	
 	public void setWheelVelocity(int leftWheel, int rightWheel) throws IOException {
-		PostMethod post = new PostMethod(REST_BASE_URL + "cmd/" + playerHash );
+		PostMethod post = new PostMethod(EROVER_UPLINK_SERVER_URI + "cmd/" + playerHash );
 		try {
 			String command = leftWheel + "," + rightWheel;
 			post.setRequestEntity(new StringRequestEntity(command, "text/xml", "UTF-8"));

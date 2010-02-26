@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: S3
 Bundle-SymbolicName: org.eclipsecon.ebots.s3
 Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.jets3t;bundle-version="1.0.0";visibility:=reexport,
  org.apache.commons.logging,
  org.apache.commons.httpclient;bundle-version="3.1.0",
@@ -12,5 +11,5 @@ Require-Bundle: org.eclipse.ui,
  org.apache.commons.io;bundle-version="1.4.0",
  org.eclipse.core.runtime;bundle-version="3.5.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipsecon.ebots.s3

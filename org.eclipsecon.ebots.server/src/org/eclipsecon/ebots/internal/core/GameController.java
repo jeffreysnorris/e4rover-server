@@ -1,16 +1,16 @@
 package org.eclipsecon.ebots.internal.core;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipsecon.ebots.core.IGoal;
-import org.eclipsecon.ebots.core.IPlayers;
+import org.eclipsecon.ebots.internal.servers.AbstractServer;
 
 public class GameController extends Thread {
 
-	protected IPlayers players = new Players();
-	private GoalHandler goalHandler = new GoalHandler();
+	private final GoalHandler goalHandler = new GoalHandler();
 	private boolean shutdown;
-	
+
 	public GameController() {
 		super("Game Controller Thread");
 	}
@@ -19,54 +19,64 @@ public class GameController extends Thread {
 	public void run() {
 
 		GameStatus game = new GameStatus();
-		
+
 		while (!shutdown) {
 
-			// TODO Check queue for next player
+			// TODO get hash and player from Rest
+
+			List<String> playerAndHash = Persister.getCurrentPlayerAndHashFromQueue();
+			if (playerAndHash.isEmpty()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				continue;
+			}
+
+			String hash = (String) playerAndHash.get(0);
+			Player player = (Player)AbstractServer.fromXML(playerAndHash.get(1));
 
 			// COUNTDOWN TO GAME START
-			game.enterCountdownState("Bob");
+			game.enterCountdownState(player.getName());
 			while (game.tickCountdownClock()) {
 				try { sleep(1000); } catch (InterruptedException e) {/*ignore*/}
 				Persister.updateToServer(game);
 			}
 
 			// START GAME
-			//TODO Get the real bucket for this player
-			CommandRelay commandRelay = new CommandRelay(game.getPlayerName());
+			CommandRelay commandRelay = new CommandRelay(hash);
 			commandRelay.start();
-			game.enterPlayingState();
+			try { 
+				game.enterPlayingState();
 
-			// PLAY GAME
-			while (game.tickPlayClock()) {
-				// Check for goals
-				IGoal goal = null;
-				try {
-					goal = goalHandler.getGoalQueue().poll(1, TimeUnit.SECONDS);
-				} catch (InterruptedException e) {/*ignore*/}
-				if (goal != null) {
-					game.handleGoal(goal);
+				// PLAY GAME
+				while (game.tickPlayClock()) {
+					// Check for goals
+					IGoal goal = null;
+					try {
+						goal = goalHandler.getGoalQueue().poll(1, TimeUnit.SECONDS);
+					} catch (InterruptedException e) {/*ignore*/}
+					if (goal != null) {
+						game.handleGoal(goal);
+					}
+					Persister.updateToServer(game);
 				}
-				Persister.updateToServer(game);
+			} finally {
+				// GAME OVER
+				commandRelay.stop();
 			}
-
-			// GAME OVER
-			//commandRelay.stop();
-			String lastPlayerName = game.getPlayerName();
 			int lastScore = game.getScore();
 			game.enterGameOverState();
 			Persister.updateToServer(game);
 
 			// UPDATE SCORES
-			Player player = (Player)players.getPlayerMap().get(lastPlayerName);
-			// TODO: Null check OR make the get blocking 
 			player.incrementPlayCount();
 			// Update player best score if warranted
-			if (player.getHighScore() < lastScore) {
-				player.setHighScore(lastScore);
-			}
+			player.updateHighScore(lastScore);
 
-			Persister.updateToServer(players);
+			//update with just the player
+			Persister.updateToServer(player, hash);
 
 		}
 
@@ -75,6 +85,6 @@ public class GameController extends Thread {
 
 	public void shutdown() {
 		shutdown = true;
-		goalHandler.shutdown();
+		if (goalHandler != null) goalHandler.shutdown();
 	}
 }

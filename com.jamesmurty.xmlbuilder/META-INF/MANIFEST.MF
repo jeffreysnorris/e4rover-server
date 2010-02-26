@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.jamesmurty.xmlbuilder
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: JAMESMURTY
 Require-Bundle: org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.jamesmurty.utils,
  net.iharder.base64

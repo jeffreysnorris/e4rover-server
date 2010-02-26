@@ -4,9 +4,9 @@ import java.util.Random;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.eclipsecon.ebots.core.IS3Constants;
+import org.eclipsecon.ebots.core.IServerConstants;
 
-public class CommandRelay implements IS3Constants {
+public class CommandRelay implements IServerConstants {
 
 	private static final HttpClient client = new HttpClient();
 	public final String playerName;
@@ -35,10 +35,12 @@ public class CommandRelay implements IS3Constants {
 						// read or hasn't changed at all since the last time we
 						// read it, we'll get back a 0-length result and make
 						// another read attempt.
-						GetMethod get = new GetMethod(REST_BASE_URL + "cmd/" + playerName);
+						GetMethod get = new GetMethod(EROVER_UPLINK_SERVER_URI + "cmd/" + playerName);
 
 						try {
+							long time = System.currentTimeMillis();
 							client.executeMethod(get);
+							System.err.println(System.currentTimeMillis() - time);
 							byte[] msg = get.getResponseBody();
 							if (msg.length > 0) {
 
@@ -66,7 +68,9 @@ public class CommandRelay implements IS3Constants {
 											continue;
 
 										//send the command to the robot controller here
+										long time2 = System.currentTimeMillis();
 										rc.setWheelVelocity(wheel1, wheel2);
+										System.err.println("Time to command: " + (System.currentTimeMillis() - time2));
 									}
 									else 
 										return;
@@ -93,11 +97,11 @@ public class CommandRelay implements IS3Constants {
 	}
 
 	public void stop() {
-		System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire.header", "info");
 		//disable polling
 		synchronized(active) {
 			active = false;
 		}
+		rc.setWheelVelocity(0, 0);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -106,11 +110,13 @@ public class CommandRelay implements IS3Constants {
 //		game.enterCountdownState("Bob");
 //		new CommandRelay("Bob").start();
 
-		Commander cmder = new Commander("Bob");
+		Commander cmder = new Commander("b8c8d2b7cd0ed6a29787569f4498fa833e49b65e");
 		Random r = new Random();
 		for (int i = 0; i<5000; ++i) {
+			long time = System.currentTimeMillis();
 			cmder.setWheelVelocity((100 - r.nextInt(200)), (100 - r.nextInt(200)));
-			Thread.sleep(0);
+			Thread.sleep(100);
+			System.err.println(System.currentTimeMillis() - time);
 		}
 		Thread.sleep(30000);
 	}
