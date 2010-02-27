@@ -19,7 +19,7 @@ public class RobotController extends Thread {
 	private static RobotController singleton;
 	static {
 		singleton = new RobotController();
-//		singleton.start();
+		singleton.start();
 	}
 
 	public static RobotController getDefault() {
@@ -171,20 +171,19 @@ public class RobotController extends Thread {
 	}
 
 	public void setWheelVelocity(int left, int right) {
-		return;
-		//		// If we've lost connection, just wait until connection is re-established
-		//		while (!connected()) {
-		//			try {
-		//				Thread.sleep(1000);
-		//			} catch (InterruptedException e) {/*empty*/}
-		//		}
-		//
-		//		try {
-		//			nxtCommand.setOutputState(LEFT_WHEEL_PORT, (byte)left, 0, 0, 0, 0, 9999);
-		//			nxtCommand.setOutputState(RIGHT_WHEEL_PORT, (byte)right, 0, 0, 0, 0, 9999);
-		//		} catch (IOException e) {
-		//			e.printStackTrace();
-		//		}
+				// If we've lost connection, just wait until connection is re-established
+				while (!connected()) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {/*empty*/}
+				}
+		
+				try {
+					nxtCommand.setOutputState(LEFT_WHEEL_PORT, (byte)left, 0, 0, 0, 0, 9999);
+					nxtCommand.setOutputState(RIGHT_WHEEL_PORT, (byte)right, 0, 0, 0, 0, 9999);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 	}
 
 	public boolean connected() {

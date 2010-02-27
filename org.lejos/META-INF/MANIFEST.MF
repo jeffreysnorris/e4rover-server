@@ -4,8 +4,7 @@ Bundle-Name: Lejos
 Bundle-SymbolicName: org.lejos
 Bundle-Version: 1.0.0
 Bundle-ClassPath: pccomm.jar,
- bluecove.jar,
- pctools.jar
+ bluecove.jar
 Export-Package: javax.bluetooth,
  javax.microedition.io,
  lejos.geom,
@@ -14,7 +13,6 @@ Export-Package: javax.bluetooth,
  lejos.nxt.rcxcomm,
  lejos.nxt.remote,
  lejos.pc.comm,
- lejos.pc.tools,
  lejos.robotics,
  lejos.robotics.localization,
  lejos.robotics.mapping,

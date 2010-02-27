@@ -1,19 +1,23 @@
 package org.eclipsecon.ebots.internal.core;
 
+import java.io.IOException;
 import java.util.Random;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.eclipsecon.ebots.core.IServerConstants;
 
+/**
+ * Just a class for testing client commanding.  Sends random commands.
+ */
 public class CommandRelay implements IServerConstants {
 
 	private static final HttpClient client = new HttpClient();
 	public final String playerName;
 	public static final String BUCKET_NAME = "khawaja";
 	private RobotController rc = RobotController.getDefault();
-
-
 
 	private Boolean active = false;
 
@@ -106,11 +110,7 @@ public class CommandRelay implements IServerConstants {
 
 	public static void main(String[] args) throws Exception {
 
-//		GameStatus game = new GameStatus();
-//		game.enterCountdownState("Bob");
-//		new CommandRelay("Bob").start();
-
-		Commander cmder = new Commander("b8c8d2b7cd0ed6a29787569f4498fa833e49b65e");
+		Commander cmder = new Commander("31fe55312df65416fb4a31ad68cd7b1a40304226");
 		Random r = new Random();
 		for (int i = 0; i<5000; ++i) {
 			long time = System.currentTimeMillis();
@@ -120,4 +120,30 @@ public class CommandRelay implements IServerConstants {
 		}
 		Thread.sleep(30000);
 	}
+	
+
+
+	static class Commander implements IServerConstants {
+		
+		private  final HttpClient client = new HttpClient();
+		private final String playerHash;
+		
+		public Commander(String playerHash) {
+			this.playerHash = playerHash;
+		}
+		
+		public void setWheelVelocity(int leftWheel, int rightWheel) throws IOException {
+			PostMethod post = new PostMethod(EROVER_UPLINK_SERVER_URI + "cmd/" + playerHash );
+			try {
+				String command = leftWheel + "," + rightWheel;
+				post.setRequestEntity(new StringRequestEntity(command, "text/xml", "UTF-8"));
+				client.executeMethod(post);
+			} finally {
+				post.releaseConnection();
+			}
+			
+		}
+
+	}
+
 }

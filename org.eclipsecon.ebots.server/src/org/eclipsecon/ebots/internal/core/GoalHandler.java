@@ -94,6 +94,7 @@ public class GoalHandler implements TagGainListener, AttachListener, ErrorListen
 		System.out.println(ae);
 		try {
 			((RFIDPhidget) ae.getSource()).setLEDOn(true);
+			((RFIDPhidget) ae.getSource()).setAntennaOn(true);
 		} catch (PhidgetException e) {
 			e.printStackTrace();
 		}

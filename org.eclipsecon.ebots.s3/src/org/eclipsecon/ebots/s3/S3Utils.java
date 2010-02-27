@@ -57,7 +57,7 @@ public class S3Utils {
 			bucket.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
 			s3Service.putBucketAcl(bucket);
 		} catch (S3ServiceException e) {
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		}
 	}
 
@@ -69,7 +69,7 @@ public class S3Utils {
 			else
 				s3Service.suspendBucketVersioning(bucket);
 		} catch (S3ServiceException e) {
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		}
 	}
 	public static String downloadFileAsByteArrayIfDifferent(String bucketName, String name, String oldVersion, OutputStream os) throws IOException {
@@ -85,7 +85,7 @@ public class S3Utils {
 			}
 
 		} catch (S3ServiceException e) {
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		} finally {
 			if (obj != null) obj.closeDataInputStream();
 		}
@@ -157,7 +157,7 @@ public class S3Utils {
 			obj.setContentLength(data.available());
 			s3Service.putObject(bucket, obj);
 		} catch (Exception e) {
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		} finally {
 			data.close();
 		}
@@ -169,7 +169,7 @@ public class S3Utils {
 		try {
 			s3Service.createBucket(bucket);
 		} catch (S3ServiceException e) {
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		}
 
 	}
@@ -226,7 +226,7 @@ public class S3Utils {
 			s3Service.putBucketAcl(bucket);
 		} catch (S3ServiceException e) {
 			e.printStackTrace();
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		}
 	}
 	
