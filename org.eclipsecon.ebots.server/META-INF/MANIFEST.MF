@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Server
-Bundle-SymbolicName: org.eclipsecon.ebots.server2;singleton:=true
+Bundle-SymbolicName: org.eclipsecon.ebots.server;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipsecon.ebots;bundle-version="1.0.0",
