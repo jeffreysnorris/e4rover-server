@@ -2,13 +2,14 @@ package org.eclipsecon.ebots.internal.core;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipsecon.ebots.internal.servers.AbstractServer;
 
 public class ArenaServerApplication implements IApplication {
 
 	private GameController gameController;
 
 	enum ROBOT {SPIRIT, OPPY}
-	private static ROBOT robotName = ROBOT.SPIRIT;
+	private static ROBOT robotName = ROBOT.OPPY;
 
 	public Object start(IApplicationContext context) throws Exception {
 		
@@ -23,6 +24,10 @@ public class ArenaServerApplication implements IApplication {
 		}
 		RobotController.getDefault();
 
+		AbstractServer.xstream.alias("game", GameStatus.class);
+		AbstractServer.xstream.omitField(GameStatus.class, "gameStartTimeMillis");
+		AbstractServer.xstream.omitField(GameStatus.class, "gameEndTimeMillis");
+		
 		gameController = new GameController();
 		gameController.start();
 		System.in.read();  // Shutdown when enter key pressed

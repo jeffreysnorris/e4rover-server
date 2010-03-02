@@ -18,9 +18,10 @@ import org.eclipsecon.ebots.s3.S3Utils;
 public class Persister {
 	
 	private static final String EBOTS_BUCKET_NAME = "ebots";
+	
 	public static void updateToServer(IGame game) {
 		try {
-			S3Utils.uploadFile(EBOTS_BUCKET_NAME, IServerConstants.GAME_FILE_NAME, game.toString(),true);
+			S3Utils.uploadFile(EBOTS_BUCKET_NAME, IServerConstants.GAME_FILE_NAME, AbstractServer.toXML(game),true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
