@@ -35,7 +35,7 @@ public class GameController extends Thread {
 			}
 
 			String hash = (String) playerAndHash.get(0);
-			Player player = (Player)AbstractServer.fromXML(playerAndHash.get(1));
+			Player player = (Player)Persister.fromXML(playerAndHash.get(1));
 
 			// COUNTDOWN TO GAME START
 			game.enterCountdownState(player.getName());

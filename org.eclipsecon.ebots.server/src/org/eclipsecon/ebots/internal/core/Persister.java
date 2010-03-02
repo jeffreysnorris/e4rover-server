@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -12,16 +14,26 @@ import org.eclipsecon.ebots.core.IGame;
 import org.eclipsecon.ebots.core.IPlayer;
 import org.eclipsecon.ebots.core.IRobot;
 import org.eclipsecon.ebots.core.IServerConstants;
-import org.eclipsecon.ebots.internal.servers.AbstractServer;
+import org.eclipsecon.ebots.core.XmlSerializer;
 import org.eclipsecon.ebots.s3.S3Utils;
 
 public class Persister {
 	
 	private static final String EBOTS_BUCKET_NAME = "ebots";
+	public static final XmlSerializer serializer;
+	protected static HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+
+	static {
+		serializer = new XmlSerializer();
+		serializer.getXstream().alias("game", GameStatus.class);
+		serializer.getXstream().omitField(GameStatus.class, "gameStartTimeMillis");
+		serializer.getXstream().omitField(GameStatus.class, "gameEndTimeMillis");
+	}
 	
 	public static void updateToServer(IGame game) {
 		try {
-			S3Utils.uploadFile(EBOTS_BUCKET_NAME, IServerConstants.GAME_FILE_NAME, AbstractServer.toXML(game),true);
+			S3Utils.uploadFile(EBOTS_BUCKET_NAME, IServerConstants.GAME_FILE_NAME, 
+					serializer.toXML(game),true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -31,8 +43,8 @@ public class Persister {
 		
 		PutMethod put = new PutMethod(IServerConstants.EROVER_UPLINK_SERVER_URI + "player/" +hash);
 		try {
-			put.setRequestEntity(new StringRequestEntity(AbstractServer.toXML(player), null, "UTF-8"));
-			AbstractServer.httpClient.executeMethod(put);
+			put.setRequestEntity(new StringRequestEntity(serializer.toXML(player), null, "UTF-8"));
+			httpClient.executeMethod(put);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -58,7 +70,7 @@ public class Persister {
 		GetMethod get = new GetMethod(IServerConstants.QUEUE_RESTLET);
 		List<String> ret = new ArrayList<String>();
 		try {
-			int resp = AbstractServer.httpClient.executeMethod(get);
+			int resp = httpClient.executeMethod(get);
 			if (resp != HttpStatus.SC_OK) {
 				return ret;
 			}
@@ -72,5 +84,9 @@ public class Persister {
 		
 		return ret;
 		
+	}
+
+	public static Object fromXML(String s) {
+		return serializer.fromXML(s);
 	}
 }

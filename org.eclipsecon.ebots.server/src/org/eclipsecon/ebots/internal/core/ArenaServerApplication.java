@@ -24,10 +24,6 @@ public class ArenaServerApplication implements IApplication {
 		}
 		RobotController.getDefault();
 
-		AbstractServer.xstream.alias("game", GameStatus.class);
-		AbstractServer.xstream.omitField(GameStatus.class, "gameStartTimeMillis");
-		AbstractServer.xstream.omitField(GameStatus.class, "gameEndTimeMillis");
-		
 		gameController = new GameController();
 		gameController.start();
 		System.in.read();  // Shutdown when enter key pressed
