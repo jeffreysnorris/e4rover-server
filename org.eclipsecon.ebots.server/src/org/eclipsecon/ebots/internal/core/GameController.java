@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipsecon.ebots.core.IGoal;
-import org.eclipsecon.ebots.internal.servers.AbstractServer;
 
 public class GameController extends Thread {
 

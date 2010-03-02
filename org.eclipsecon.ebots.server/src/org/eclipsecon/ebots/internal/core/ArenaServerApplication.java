@@ -2,7 +2,6 @@ package org.eclipsecon.ebots.internal.core;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipsecon.ebots.internal.servers.AbstractServer;
 
 public class ArenaServerApplication implements IApplication {
 
