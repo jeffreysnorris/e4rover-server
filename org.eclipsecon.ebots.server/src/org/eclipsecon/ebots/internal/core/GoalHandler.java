@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.eclipsecon.ebots.core.IGoal;
-import org.eclipsecon.ebots.core.IGoal.TARGET;
+import org.eclipsecon.e4rover.core.IGoal;
+import org.eclipsecon.e4rover.core.IGoal.TARGET;
+import org.eclipsecon.e4rover.internal.core.Goal;
 import org.eclipsecon.ebots.internal.core.ArenaServerApplication.ROBOT;
 
 import com.phidgets.PhidgetException;

@@ -10,11 +10,11 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.eclipsecon.ebots.core.IGame;
-import org.eclipsecon.ebots.core.IPlayer;
-import org.eclipsecon.ebots.core.IRobot;
-import org.eclipsecon.ebots.core.IServerConstants;
-import org.eclipsecon.ebots.core.XmlSerializer;
+import org.eclipsecon.e4rover.core.IGame;
+import org.eclipsecon.e4rover.core.IPlayer;
+import org.eclipsecon.e4rover.core.IRobot;
+import org.eclipsecon.e4rover.core.IServerConstants;
+import org.eclipsecon.e4rover.core.XmlSerializer;
 import org.eclipsecon.ebots.s3.S3Utils;
 
 public class Persister {

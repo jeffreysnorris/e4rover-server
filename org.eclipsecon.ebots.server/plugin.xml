@@ -9,7 +9,7 @@
             thread="main"
             visible="true">
          <run
-               class="org.eclipsecon.ebots.internal.core.ArenaServerApplication">
+               class="org.eclipsecon.e4rover.internal.core.ArenaServerApplication">
          </run>
       </application>
    </extension>

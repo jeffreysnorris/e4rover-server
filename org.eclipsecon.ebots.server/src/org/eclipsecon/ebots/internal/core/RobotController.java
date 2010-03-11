@@ -2,6 +2,8 @@ package org.eclipsecon.ebots.internal.core;
 
 import java.io.IOException;
 
+import org.eclipsecon.e4rover.internal.core.Robot;
+
 import lejos.nxt.remote.NXTCommand;
 import lejos.nxt.remote.OutputState;
 import lejos.pc.comm.NXTComm;

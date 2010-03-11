@@ -7,7 +7,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.eclipsecon.ebots.core.IServerConstants;
+import org.eclipsecon.e4rover.core.IServerConstants;
 
 /**
  * Just a class for testing client commanding.  Sends random commands.

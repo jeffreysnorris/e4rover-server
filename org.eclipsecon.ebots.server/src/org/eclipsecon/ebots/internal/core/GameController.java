@@ -3,7 +3,8 @@ package org.eclipsecon.ebots.internal.core;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipsecon.ebots.core.IGoal;
+import org.eclipsecon.e4rover.core.IGoal;
+import org.eclipsecon.e4rover.internal.core.Player;
 
 public class GameController extends Thread {
 

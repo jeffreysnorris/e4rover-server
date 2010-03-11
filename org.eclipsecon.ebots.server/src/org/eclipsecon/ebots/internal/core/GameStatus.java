@@ -1,7 +1,9 @@
 package org.eclipsecon.ebots.internal.core;
 
-import org.eclipsecon.ebots.core.IGame;
-import org.eclipsecon.ebots.core.IGoal;
+import org.eclipsecon.e4rover.core.IGame;
+import org.eclipsecon.e4rover.core.IGoal;
+import org.eclipsecon.e4rover.internal.core.Game;
+import org.eclipsecon.e4rover.internal.core.Goal;
 
 public class GameStatus extends Game {
 	private long gameStartTimeMillis;
